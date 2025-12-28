@@ -233,38 +233,13 @@ export default function HomePage() {
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap justify-center gap-x-8 gap-y-4">
-                      <a
-                          className="text-[#5c4d41] dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
-                          href="#"
-                      >
-                        Support
-                      </a>
-                      <a
-                          className="text-[#5c4d41] dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
-                          href="#"
-                      >
-                        Privacy Policy
-                      </a>
-                      <a
-                          className="text-[#5c4d41] dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
-                          href="#"
-                      >
-                        Terms of Service
-                      </a>
-                      <a
-                          className="text-[#5c4d41] dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium"
-                          href="#"
-                      >
-                        Careers
-                      </a>
-                    </div>
+
                   </div>
 
                   <div className="h-px w-full bg-[#e6e0db] dark:bg-[#3a2d25]" />
 
                   <p className="text-[#897261] dark:text-gray-500 text-sm font-normal text-center">
-                    © 2023 The Daily Chronicle. All rights reserved.
+                    © 2025 The Daily Chronicle. All rights reserved.
                   </p>
                 </footer>
               </div>
