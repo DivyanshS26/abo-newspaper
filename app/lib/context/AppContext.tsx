@@ -24,6 +24,10 @@ interface AppContextType {
     // Delivery address (temporary until registration)
     deliveryPlz: string;
     setDeliveryPlz: (plz: string) => void;
+
+    deliveryCity: string;
+    setDeliveryCity: (city: string) => void;
+
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -34,6 +38,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const [selectedVersion, setSelectedVersion] = useState<LocalPaperVersion | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [deliveryPlz, setDeliveryPlz] = useState('');
+    const [deliveryCity, setDeliveryCity] = useState('');
 
     return (
         <AppContext.Provider
@@ -48,6 +53,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 setIsLoading,
                 deliveryPlz,
                 setDeliveryPlz,
+                deliveryCity,
+                setDeliveryCity,
             }}
         >
             {children}

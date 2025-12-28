@@ -35,7 +35,7 @@ export default function Input({
                 id={id}
                 type={type}
                 value={value}
-                onChange={(e) => onChange(e.target.value)}
+                onChange={(e) => onChange((e?.target as HTMLInputElement)?.value ?? '')}
                 placeholder={placeholder}
                 required={required}
                 disabled={disabled}

@@ -11,6 +11,7 @@ interface ButtonProps {
     disabled?: boolean;
     fullWidth?: boolean;
     className?: string;
+    title?: string;
 }
 
 export default function Button({
@@ -21,6 +22,7 @@ export default function Button({
                                    disabled = false,
                                    fullWidth = false,
                                    className = '',
+                                   title,
                                }: ButtonProps) {
 
     const baseStyles = 'px-6 py-3 font-serif font-bold uppercase tracking-wide transition-all duration-200 border-2';
@@ -38,6 +40,7 @@ export default function Button({
             type={type}
             onClick={onClick}
             disabled={disabled}
+            title={title}
             className={`${baseStyles} ${variantStyles[variant]} ${widthStyle} ${className} disabled:cursor-not-allowed disabled:opacity-50`}
         >
             {children}

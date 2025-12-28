@@ -1,7 +1,7 @@
 // app/lib/utils.ts
 
 /**
- * Calculate subscription price based on parameters (MVP simplified logic)
+ * Calculate subscription price based on parameters
  */
 export function calculatePrice(
     distance: number,
@@ -35,4 +35,21 @@ export function calculatePrice(
  */
 export function formatPrice(price: number): string {
     return `€${price.toFixed(2)}`;
+}
+
+/**
+ * Validate email format
+ */
+export function isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+/**
+ * Hash password (simple - for demo only)
+ */
+export function hashPassword(password: string): string {
+    // In production, use bcrypt or similar
+    // For demo, we'll use a simple approach
+    return btoa(password); // Base64 encoding (NOT secure for production)
 }

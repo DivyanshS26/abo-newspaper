@@ -12,7 +12,7 @@ import {
     _getAllAbosForCustomer,
     _readAllAbos,
     _getLocalVersionsForPlz,
-} from './_Database.js'
+} from './Database.js'
 
 //****************************************/
 // 1. Berechne die Strecke von der Firma bis zum Kunden für die Preisberechnung
