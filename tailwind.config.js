@@ -1,24 +1,31 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: "class",
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
       colors: {
-        paper: '#f5f1e8',
-        ink: '#1a1410',
-        gold: '#c9a961',
-        border: '#2d2520',
-        hover: '#e8dcc8',
+        primary: "#ec6d13",
+        "background-light": "#f8f7f6",
+        "background-dark": "#221810",
       },
       fontFamily: {
-        serif: ['Georgia', 'serif'],
-        mono: ['Courier New', 'monospace'],
+        display: ["var(--font-work-sans)", "sans-serif"],
+        serif: ["var(--font-merriweather)", "serif"],
+      },
+      borderRadius: {
+        DEFAULT: "0.25rem",
+        lg: "0.5rem",
+        xl: "0.75rem",
+        full: "9999px",
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require("@tailwindcss/forms"),
+    require("@tailwindcss/container-queries"),
+  ],
 };

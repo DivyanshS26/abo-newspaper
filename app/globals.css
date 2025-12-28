@@ -2,11 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #f5f1e8;
-  color: #1a1410;
-  font-family: Georgia, serif;
-}
+
+/* Body defaults removed - let Tailwind classes handle this */
 
 @layer components {
   .newspaper-header {
