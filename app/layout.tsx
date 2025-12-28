@@ -1,4 +1,4 @@
-// app/layout.tsx
+
 import "./globals.css";
 import Providers from "./providers";
 import { Merriweather, Work_Sans } from "next/font/google";

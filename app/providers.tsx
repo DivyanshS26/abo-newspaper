@@ -1,4 +1,4 @@
-// app/providers.tsx
+
 "use client";
 
 import { AppProvider } from "./lib/context/AppContext";

@@ -1,4 +1,4 @@
-// app/subscription/confirmation/page.tsx
+
 'use client';
 
 import { useMemo } from 'react';
@@ -35,7 +35,6 @@ export default function ConfirmationPage() {
         };
     }, [isMissingData, currentUser, currentSubscription, selectedVersion, deliveryPlz]);
 
-    // Simple helper to show a friendly next billing date (UI only).
     const nextBillingDateLabel = useMemo(() => {
         const d = new Date();
         d.setDate(d.getDate() + 30);
@@ -45,7 +44,6 @@ export default function ConfirmationPage() {
     if (isMissingData) {
         return (
             <div className="min-h-screen bg-background-light dark:bg-background-dark font-display text-[#181411] dark:text-gray-100 flex flex-col">
-                {/* Header (brand only) */}
                 <header className="w-full bg-white dark:bg-[#2d231b] border-b border-[#e6e0db] dark:border-[#3e342e]">
                     <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="h-16 flex items-center">
@@ -83,7 +81,6 @@ export default function ConfirmationPage() {
 
     return (
         <div className="bg-background-light dark:bg-background-dark font-display text-[#181411] dark:text-gray-100 flex flex-col min-h-screen overflow-x-hidden">
-            {/* Header (brand only) */}
             <header className="w-full bg-white dark:bg-[#2d231b] border-b border-[#e6e0db] dark:border-[#3e342e]">
                 <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="h-16 flex items-center">
@@ -98,7 +95,6 @@ export default function ConfirmationPage() {
             </header>
 
             <main className="flex-grow flex flex-col items-center justify-center py-12 px-4 sm:px-6">
-                {/* Success Hero */}
                 <div className="flex flex-col items-center text-center gap-6 mb-10">
                     <div className="size-20 rounded-full bg-primary/10 flex items-center justify-center mb-2">
                         <span className="material-symbols-outlined text-5xl text-primary">check_circle</span>
@@ -116,7 +112,6 @@ export default function ConfirmationPage() {
                     </div>
                 </div>
 
-                {/* Order Summary Card */}
                 <div className="w-full max-w-[640px] bg-white dark:bg-[#2d231b] rounded-2xl shadow-sm border border-[#e6e0db] dark:border-[#3e342e] overflow-hidden">
                     <div className="bg-[#fcfbf9] dark:bg-[#28201a] px-6 py-4 border-b border-[#e6e0db] dark:border-[#3e342e] flex justify-between items-center">
                         <h3 className="text-base font-bold text-[#181411] dark:text-white">Order Summary</h3>

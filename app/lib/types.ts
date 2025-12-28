@@ -1,6 +1,4 @@
-// app/lib/types.ts
 
-// Address structure
 export interface Address {
     street1: string;
     street2?: string;
@@ -8,7 +6,6 @@ export interface Address {
     plz: string;
 }
 
-// Customer structure
 export interface Customer {
     id: number;
     firstname: string;
@@ -21,10 +18,9 @@ export interface Customer {
     billingAddress: Address;
 }
 
-// Subscription/Abo structure
 export interface Subscription {
     id: number;
-    cid: number; // Customer ID
+    cid: number;
     created: string;
     startabodate: string;
     endabodate: string;
@@ -39,21 +35,17 @@ export interface Subscription {
     localpaperversions: number;
 }
 
-// Local newspaper version
 export interface LocalPaperVersion {
     id: number;
     name: string;
     picture: string;
 }
 
-// Distance calculation result
 export interface DistanceResult {
     distance: number;
     plzDestination: string;
 }
 
-// New customer form data (no ID yet)
 export type NewCustomer = Omit<Customer, 'id'> & { id?: number };
 
-// New subscription form data (no ID yet)
 export type NewSubscription = Omit<Subscription, 'id'> & { id?: number };

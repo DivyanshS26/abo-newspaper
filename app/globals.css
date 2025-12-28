@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 
-/* Body defaults removed - let Tailwind classes handle this */
 
 @layer components {
   .newspaper-header {

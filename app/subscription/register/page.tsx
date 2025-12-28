@@ -1,4 +1,4 @@
-// app/subscription/register/page.tsx
+
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -13,7 +13,6 @@ export default function RegisterPage() {
     const { currentSubscription, deliveryPlz, deliveryCity, setCurrentUser, setIsLoading } =
         useAppContext();
 
-    // Personal Info
     const [firstname, setFirstname] = useState('');
     const [lastname, setLastname] = useState('');
     const [email, setEmail] = useState('');
@@ -21,28 +20,23 @@ export default function RegisterPage() {
     const [phone, setPhone] = useState('');
     const [companyname, setCompanyname] = useState('');
 
-    // Delivery Address
     const [deliveryStreet1, setDeliveryStreet1] = useState('');
     const [deliveryStreet2, setDeliveryStreet2] = useState('');
     const [deliveryCityState, setDeliveryCityState] = useState(deliveryCity);
     const [deliveryPlzInput, setDeliveryPlzInput] = useState(deliveryPlz);
 
-    // Billing Address
     const [useSameAddress, setUseSameAddress] = useState(true);
     const [billingStreet1, setBillingStreet1] = useState('');
     const [billingStreet2, setBillingStreet2] = useState('');
     const [billingCity, setBillingCity] = useState('');
     const [billingPlz, setBillingPlz] = useState('');
 
-    // Privacy
     const [acceptPrivacy, setAcceptPrivacy] = useState(false);
 
-    // UI State
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        // Keep the same behavior: if subscription is missing, restart flow.
         if (!currentSubscription) {
             router.push('/subscription/address');
         }
@@ -51,7 +45,6 @@ export default function RegisterPage() {
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};
 
-        // Personal info validation
         if (!firstname.trim()) newErrors.firstname = 'First name is required';
         if (!lastname.trim()) newErrors.lastname = 'Last name is required';
         if (!email.trim()) newErrors.email = 'Email is required';
@@ -59,14 +52,12 @@ export default function RegisterPage() {
         if (!password) newErrors.password = 'Password is required';
         else if (password.length < 6) newErrors.password = 'Password must be at least 6 characters';
 
-        // Delivery address validation
         if (!deliveryStreet1.trim()) newErrors.deliveryStreet1 = 'Street is required';
         if (!deliveryCityState.trim()) newErrors.deliveryCity = 'City is required';
         if (!deliveryPlzInput || deliveryPlzInput.length !== 5) {
             newErrors.deliveryPlz = 'Valid 5-digit postal code required';
         }
 
-        // Billing address validation (if different)
         if (!useSameAddress) {
             if (!billingStreet1.trim()) newErrors.billingStreet1 = 'Billing street is required';
             if (!billingCity.trim()) newErrors.billingCity = 'Billing city is required';
@@ -75,7 +66,6 @@ export default function RegisterPage() {
             }
         }
 
-        // Privacy acceptance
         if (!acceptPrivacy) newErrors.privacy = 'You must accept the privacy policy';
 
         setErrors(newErrors);
@@ -87,7 +77,6 @@ export default function RegisterPage() {
 
         if (!validateForm()) return;
 
-        // Check if we have subscription data (same as before)
         if (!currentSubscription) {
             alert('Subscription configuration missing. Please start from the beginning.');
             router.push('/subscription/address');
@@ -98,7 +87,6 @@ export default function RegisterPage() {
         setIsLoading(true);
 
         try {
-            // Check if email already exists
             const existingCustomer = await readCustomer(email);
             if (existingCustomer.customer[0]) {
                 setErrors({ email: 'This email is already registered' });
@@ -173,13 +161,11 @@ export default function RegisterPage() {
     const hasSubscription = useMemo(() => Boolean(currentSubscription), [currentSubscription]);
 
     if (!hasSubscription) {
-        // Avoid layout flash while redirecting
         return null;
     }
 
     return (
         <div className="relative flex min-h-screen flex-col bg-background-light dark:bg-background-dark text-text-main dark:text-white font-display overflow-x-hidden">
-            {/* Top Navigation (no sign-in UI) */}
             <header className="sticky top-0 z-50 flex items-center justify-between border-b border-border-light dark:border-border-dark bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur px-6 py-4 md:px-10 lg:px-40">
                 <div
                     className="flex items-center gap-4 cursor-pointer"
@@ -196,10 +182,8 @@ export default function RegisterPage() {
                 </div>
             </header>
 
-            {/* Main */}
             <main className="flex-1 w-full max-w-[900px] mx-auto px-4 md:px-10 py-10">
                 <div className="flex flex-col gap-8">
-                    {/* Progress */}
                     <div className="flex flex-col gap-3">
                         <div className="flex justify-between items-end">
                             <p className="text-text-main dark:text-white text-base font-semibold leading-normal">
@@ -212,7 +196,6 @@ export default function RegisterPage() {
                         </div>
                     </div>
 
-                    {/* Heading */}
                     <div className="flex flex-col gap-2">
                         <h1 className="text-3xl md:text-4xl font-black leading-tight tracking-tight text-text-main dark:text-white">
                             Create your account
@@ -222,10 +205,8 @@ export default function RegisterPage() {
                         </p>
                     </div>
 
-                    {/* Form Container */}
                     <div className="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-sm overflow-hidden">
                         <form onSubmit={handleSubmit}>
-                            {/* General Error */}
                             {errors.general && (
                                 <div className="px-6 md:px-8 pt-6">
                                     <div className="rounded-lg border border-red-500 bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-200 p-4 text-sm">
@@ -234,7 +215,6 @@ export default function RegisterPage() {
                                 </div>
                             )}
 
-                            {/* Account details */}
                             <div className="p-6 md:p-8 flex flex-col gap-6 border-b border-border-light dark:border-border-dark">
                                 <div className="flex items-center gap-3">
                                     <div className="bg-primary/10 p-2 rounded-full text-primary">
@@ -335,7 +315,6 @@ export default function RegisterPage() {
                                 </div>
                             </div>
 
-                            {/* Delivery address */}
                             <div className="p-6 md:p-8 flex flex-col gap-6 border-b border-border-light dark:border-border-dark">
                                 <div className="flex items-center gap-3">
                                     <div className="bg-primary/10 p-2 rounded-full text-primary">
@@ -406,9 +385,7 @@ export default function RegisterPage() {
                                 </div>
                             </div>
 
-                            {/* Billing & legal */}
                             <div className="p-6 md:p-8 flex flex-col gap-6">
-                                {/* Toggle */}
                                 <div className="flex items-center justify-between p-4 rounded-lg border border-border-light dark:border-border-dark bg-background-light/60 dark:bg-background-dark/10">
                                     <div className="flex flex-col">
                     <span className="text-text-main dark:text-white text-base font-bold">
@@ -496,7 +473,6 @@ export default function RegisterPage() {
                                     </div>
                                 )}
 
-                                {/* Privacy */}
                                 <div className="flex items-start gap-3">
                                     <input
                                         className="h-5 w-5 rounded border-border-light dark:border-border-dark text-primary focus:ring-primary dark:bg-[#221810]"
@@ -517,7 +493,6 @@ export default function RegisterPage() {
                                 </div>
                             </div>
 
-                            {/* Actions */}
                             <div className="p-6 md:p-8 bg-background-light/60 dark:bg-background-dark/10 border-t border-border-light dark:border-border-dark flex flex-col sm:flex-row gap-4 justify-between items-center">
                                 <button
                                     type="button"

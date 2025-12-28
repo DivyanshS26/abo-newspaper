@@ -1,4 +1,4 @@
-// app/subscription/configure/page.tsx
+
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -12,7 +12,6 @@ export default function ConfigurePage() {
     const router = useRouter();
     const { deliveryPlz, setCurrentSubscription, setSelectedVersion } = useAppContext();
 
-    // State (kept)
     const [localVersions, setLocalVersions] = useState<LocalPaperVersion[]>([]);
     const [selectedVersionId, setSelectedVersionId] = useState<number | null>(null);
     const [subscriptionType, setSubscriptionType] = useState<'Daily' | 'Weekend'>('Daily');
@@ -22,7 +21,6 @@ export default function ConfigurePage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    // Helper: normalize API `localversions` into LocalPaperVersion[]
     const normalizeLocalVersions = (lv: unknown): LocalPaperVersion[] => {
         if (lv == null) return [];
 
@@ -48,19 +46,16 @@ export default function ConfigurePage() {
         return candidate.filter(isLocalPaperVersion);
     };
 
-    // Treat first backend result as "local edition for your area"
     const recommendedVersionId = localVersions?.[0]?.id ?? null;
 
-    // Delivery Agent only for the local edition of the area; other editions require Post. [file:6]
-    const COMPANYPLZ = "72762"
-    const DELIVERY_MAN_MAX_KM = 50
+    const COMPANYPLZ = "72762";
+    const DELIVERY_MAN_MAX_KM = 50;
 
     const canUseDeliveryMan = useMemo(() => {
-        if (!deliveryPlz) return false
-        if (deliveryPlz === COMPANYPLZ) return true
-        return Number.isFinite(distance) && distance > 0 && distance <= DELIVERY_MAN_MAX_KM
-    }, [deliveryPlz, distance])
-
+        if (!deliveryPlz) return false;
+        if (deliveryPlz === COMPANYPLZ) return true;
+        return Number.isFinite(distance) && distance > 0 && distance <= DELIVERY_MAN_MAX_KM;
+    }, [deliveryPlz, distance]);
 
     useEffect(() => {
         if (!canUseDeliveryMan && deliveryMethod === 'Delivery man') {
@@ -68,7 +63,6 @@ export default function ConfigurePage() {
         }
     }, [canUseDeliveryMan, deliveryMethod]);
 
-    // Load on mount (kept)
     useEffect(() => {
         if (!deliveryPlz) {
             router.push('/subscription/address');
@@ -140,7 +134,6 @@ export default function ConfigurePage() {
         load();
     }, [deliveryPlz, router]);
 
-    // Pricing (kept)
     const pricing = calculatePrice(distance, subscriptionType, paymentType, deliveryMethod);
     const pricingDaily = calculatePrice(distance, 'Daily', paymentType, deliveryMethod);
     const pricingWeekend = calculatePrice(distance, 'Weekend', paymentType, deliveryMethod);
@@ -179,7 +172,6 @@ export default function ConfigurePage() {
         router.push('/subscription/register');
     };
 
-    // --- UI (template styling) ---
     if (loading) {
         return (
             <div className="bg-background-light dark:bg-background-dark text-text-main dark:text-white font-display overflow-x-hidden antialiased">
@@ -212,7 +204,6 @@ export default function ConfigurePage() {
     return (
         <div className="bg-background-light dark:bg-background-dark text-text-main dark:text-white font-display overflow-x-hidden antialiased">
             <div className="relative flex min-h-screen flex-col">
-                {/* Top Navigation (no avatar/profile button) */}
                 <header className="sticky top-0 z-50 flex items-center justify-between border-b border-border-light dark:border-border-dark bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur px-6 py-4 md:px-10 lg:px-40">
                     <div className="flex items-center gap-4">
                         <div className="text-primary">
@@ -225,7 +216,6 @@ export default function ConfigurePage() {
                 </header>
 
                 <main className="flex-grow w-full max-w-[1280px] mx-auto px-4 md:px-10 lg:px-40 py-8">
-                    {/* Progress Bar */}
                     <div className="mb-10 max-w-[960px]">
                         <div className="flex flex-col gap-3">
                             <div className="flex justify-between items-end">
@@ -243,11 +233,8 @@ export default function ConfigurePage() {
                         </div>
                     </div>
 
-                    {/* Main Content Layout */}
                     <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
-                        {/* Left Column */}
                         <div className="flex-1 flex flex-col gap-10">
-                            {/* Page Heading */}
                             <div className="flex flex-col gap-2">
                                 <h1 className="text-3xl md:text-4xl font-black leading-tight tracking-tight text-text-main dark:text-white">
                                     Customize your subscription
@@ -257,14 +244,12 @@ export default function ConfigurePage() {
                                 </p>
                             </div>
 
-                            {/* Error */}
                             {error && (
                                 <div className="max-w-[960px] rounded-xl border border-red-300 bg-red-50 dark:bg-red-950/30 dark:border-red-800 p-4">
                                     <p className="text-sm font-medium text-red-700 dark:text-red-200">{error}</p>
                                 </div>
                             )}
 
-                            {/* Section 1: Local Edition (no search; options like you already do) */}
                             <section className="space-y-4">
                                 <div className="flex items-center gap-2 mb-2">
                   <span className="flex items-center justify-center w-6 h-6 rounded-full bg-text-main dark:bg-white text-white dark:text-black text-xs font-bold">
@@ -335,7 +320,6 @@ export default function ConfigurePage() {
                                 </div>
                             </section>
 
-                            {/* Section 2: Frequency */}
                             <section className="space-y-4">
                                 <div className="flex items-center gap-2 mb-2">
                   <span className="flex items-center justify-center w-6 h-6 rounded-full bg-text-main dark:bg-white text-white dark:text-black text-xs font-bold">
@@ -345,7 +329,6 @@ export default function ConfigurePage() {
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {/* Daily */}
                                     <button
                                         type="button"
                                         onClick={() => setSubscriptionType('Daily')}
@@ -381,7 +364,6 @@ export default function ConfigurePage() {
                                         </div>
                                     </button>
 
-                                    {/* Weekend */}
                                     <button
                                         type="button"
                                         onClick={() => setSubscriptionType('Weekend')}
@@ -419,7 +401,6 @@ export default function ConfigurePage() {
                                 </div>
                             </section>
 
-                            {/* Section 3: Delivery Method */}
                             <section className="space-y-4">
                                 <div className="flex items-center gap-2 mb-2">
                   <span className="flex items-center justify-center w-6 h-6 rounded-full bg-text-main dark:bg-white text-white dark:text-black text-xs font-bold">
@@ -429,7 +410,6 @@ export default function ConfigurePage() {
                                 </div>
 
                                 <div className="grid grid-cols-1 gap-4">
-                                    {/* Agent */}
                                     <button
                                         type="button"
                                         disabled={!canUseDeliveryMan}
@@ -486,7 +466,6 @@ export default function ConfigurePage() {
                                         </div>
                                     </button>
 
-                                    {/* Postal */}
                                     <button
                                         type="button"
                                         onClick={() => setDeliveryMethod('Post')}
@@ -527,7 +506,6 @@ export default function ConfigurePage() {
                                 )}
                             </section>
 
-                            {/* Section 4: Payment Interval */}
                             <section className="space-y-4">
                                 <div className="flex items-center gap-2 mb-2">
                   <span className="flex items-center justify-center w-6 h-6 rounded-full bg-text-main dark:bg-white text-white dark:text-black text-xs font-bold">
@@ -537,7 +515,6 @@ export default function ConfigurePage() {
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    {/* Monthly */}
                                     <button
                                         type="button"
                                         onClick={() => setPaymentType('Monthly')}
@@ -552,7 +529,6 @@ export default function ConfigurePage() {
                                         <span className="font-bold text-text-main dark:text-white">Monthly</span>
                                     </button>
 
-                                    {/* Annual */}
                                     <button
                                         type="button"
                                         onClick={() => setPaymentType('Annual')}
@@ -575,7 +551,6 @@ export default function ConfigurePage() {
                             </section>
                         </div>
 
-                        {/* Right Column: Sticky Summary */}
                         <div className="w-full lg:w-[380px] shrink-0">
                             <div className="sticky top-28 flex flex-col gap-6">
                                 <div className="overflow-hidden rounded-xl border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark shadow-lg">
@@ -655,7 +630,6 @@ export default function ConfigurePage() {
                                         </div>
                                     </div>
 
-                                    {/* Actions */}
                                     <div className="bg-gray-50 dark:bg-white/5 p-6 flex flex-col gap-3">
                                         <button
                                             type="button"
@@ -688,7 +662,6 @@ export default function ConfigurePage() {
                                     </div>
                                 </div>
 
-                                {/* Trust badge (kept generic, no Stripe claim) */}
                                 <div className="flex items-center gap-3 px-4 py-2 opacity-70">
                                     <span className="material-symbols-outlined text-green-600">lock</span>
                                     <span className="text-xs text-text-secondary">

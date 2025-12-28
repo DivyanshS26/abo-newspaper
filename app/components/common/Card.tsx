@@ -1,4 +1,4 @@
-// app/components/common/Card.tsx
+
 import React from 'react';
 
 interface CardProps {
