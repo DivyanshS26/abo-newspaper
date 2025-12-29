@@ -280,7 +280,6 @@ export default function ConfigurePage() {
                                         <div className="grid grid-cols-1 gap-3">
                                             {localVersions.map((version, idx) => {
                                                 const active = selectedVersionId === version.id;
-                                                const isRecommended = recommendedVersionId === version.id;
 
                                                 return (
                                                     <button
@@ -300,11 +299,6 @@ export default function ConfigurePage() {
                                                                 <h4 className="text-base font-bold text-text-main dark:text-white">
                                                                     {version.name}
                                                                 </h4>
-                                                                <p className="text-sm text-text-secondary">
-                                                                    {isRecommended
-                                                                        ? 'Local edition for your area (delivery agent possible).'
-                                                                        : 'Non-local edition (sent by post).'}
-                                                                </p>
                                                             </div>
                                                             {active && (
                                                                 <span className="material-symbols-outlined text-primary text-[20px]">
