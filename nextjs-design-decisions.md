@@ -1,51 +1,79 @@
 # Next.js Design Decisions: Newspaper Subscription Shop (ABO Shop)
 
-**Version:** Phase 1  
+**Version:** Phase 1 (Architecture & SEO)  
 **Context:** Digitalization of Print Subscriptions
 
 ---
 
-## 1. Architectural & Design Decisions
+## 1. Route Map & Component Types
 
-We chose **Next.js 14+ with the App Router** for this project. You need a framework that supports modern e-commerce requirements like speed and SEO.
+We utilize the Next.js App Router (`app/` directory) to separate the application into a Marketing Shell (Server) and an Interactive Wizard (Client).
 
-### Framework Selection
-We use the `app/` directory structure. It gives you better layout nesting. This is critical for our subscription wizard where you need a persistent progress bar while the main content changes. The App Router also makes React Server Components (RSC) the default. This keeps your client bundle small because you only send JavaScript when you need interactivity.
+### File Structure & Component Classification
 
-### Styling Strategy
-We use **Tailwind CSS**. It speeds up development by letting you write styles directly in your markup. You can see this in our `ConfigurePage` where we use utility classes for grid layouts and colors. Tailwind also makes Dark Mode easy. You just add `dark:` modifiers. It builds a tiny CSS file that only includes the styles you actually use.
-
-### State Management
-We use a hybrid approach combining Context API with persistent storage.
-*   **Global State (Context API):** `useAppContext` manages critical session data (`currentUser`, `currentSubscription`, `selectedVersion`) across the wizard steps.
-*   **Persistence Layer:** To prevent data loss on page refresh or navigation, we implemented a **synchronous storage pattern**:
-    *   **Wrappers:** Custom setters (e.g., `setCurrentUser`) update both React state and `sessionStorage` simultaneously.
-    *   **Lazy Initialization:** State initializes directly from `sessionStorage` on mount, ensuring data survives browser navigation.
-*   **Local State:** Complex UI logic, such as toggling between "Daily" and "Weekend" options in `ConfigurePage`, remains local to keep the app responsive.
-
-### Business Logic Separation
-We separate business rules from UI code. You will find pricing and validation logic (like the "Berlin = Post Delivery" rule) in `lib/Api` and `Database.js`. This makes your React components cleaner. It also lets you test the rules without running the whole app.
+| Route / File Path                            | Type | Justification |
+|:---------------------------------------------| :--- | :--- |
+| **`app/layout.tsx`**                         | **Server** | **Root Layout.** Renders the `<html>` and `<body>` tags, loads fonts (Google Fonts), and defines base metadata. It creates the initial render shell for the entire app. |
+| **`app/page.tsx`**                           | **Server** | **Landing Page.** Contains static marketing content. Needs zero client-side hydration for maximum LCP speed and SEO indexability. |
+| **`app/subscription/layout.tsx`**            | **Server** | **Wizard Shell.** Renders the shared "Progress Bar" and wrapping containers. It isolates the subscription domain styles without re-rendering on route changes. |
+| **`app/subscription/address/page.tsx`**      | **Client** | **Interactive Form.** Handles user input for PLZ (Postal Code). Requires `useState` for input handling and `useAppContext` to save the initial state. |
+| **`app/subscription/configure/page.tsx`**    | **Client** | **Logic Heavy.** Needs real-time validation (e.g., hiding "Delivery Man" option based on PLZ). Uses the `setTimeout` navigation fix to ensure synchronous storage updates. |
+| **`app/subscription/register/page.tsx`**     | **Client** | **Form Data.** Manages complex form state (validation, errors) and updates the global context before the checkout phase. |
+| **`app/subscription/checkout/page.tsx`**     | **Client** | **Route Guard.** Implements a `useEffect` guard to redirect users if session data is missing. It reads directly from `sessionStorage` to display the final summary. |
+| **`app/subscription/confirmation/page.tsx`** | **Server** | **Static Success.** A simple "Thank You" page. Note: If we need to show order details here, we pass the Order ID via URL params to keep this component Server-side. |
 
 ---
 
-## 2. Rendering Strategy
+## 2. Data-Fetching & Rendering Strategy
 
-We use **Hybrid Rendering**. This gives you a fast initial load and a responsive interface.
+Our strategy balances SEO for marketing pages with high interactivity for the subscription funnel.
 
-### React Server Components (RSC)
-We use these for the Root Layouts and Marketing Pages. The server renders the HTML shell and metadata. You get the content fast, and the browser downloads less code.
+### 1. Landing Page (`/`): **SSG (Static Site Generation)**
+*   **Mode:** Static generation at build time.
+*   **Rationale:** The marketing value proposition does not change per user. Pre-building this page ensures the fastest possible Time-to-First-Byte (TTFB) and perfect SEO indexing.
 
-### Client Components
-We use the `use client` directive for the Subscription Wizard steps. You need this for interactivity. The `ConfigurePage` has to calculate valid delivery methods in real-time based on your input. It also gives you immediate feedback when you select an option.
+### 2. Local Editions Data (`/api/lib): **ISR (Incremental Static Regeneration)**
+*   **Mode:** `fetch('...', { next: { revalidate: 3600 } })`
+*   **Rationale:** The list of newspapers available per Zip Code changes rarely (e.g., once a month). We cache this data for 1 hour. This prevents hitting the backend database on every user request while keeping data relatively fresh.
 
-### Static Generation (SSG)
-We pre-build pages that do not change often, like the Privacy Policy and Landing Page. This means they load instantly for every user.
+### 3. Subscription Wizard (`/subscription/*`): **CSR (Client-Side Rendering)**
+*   **Mode:** Client Components wrapped in a Server Layout.
+*   **Rationale:** This section is highly state-dependent. The content (pricing, available dates) depends entirely on the user's specific inputs stored in `sessionStorage`.
+*   **State Management:** We use a custom **Synchronous Storage Pattern**. Our `AppContext` setters write to `sessionStorage` immediately, ensuring data persists even if the user refreshes the page during the wizard flow.
 
 ---
 
-## 3. Route Structure
+## 3. SEO Metadata Plan
 
-We organized the routes to match the user journey.
+We treat the **Print Subscription Configurator** (`/subscription/configure`) as a key entry point and ensure the Landing Page is perfectly optimized.
+
+### Metadata Implementation
+We use the Metadata API in `app/layout.tsx` for defaults and `generateMetadata()` in specific pages for overrides.
+
+**Global Default (`app/layout.tsx`):**
+export const metadata = {\
+title: {\
+template: '%s | The Daily Chronicle',\
+default: 'The Daily Chronicle - Quality Journalism',\
+},\
+description: 'Subscribe to the nation's leading daily newspaper. Delivery to your door.',\
+openGraph: {\
+type: 'website',\
+locale: 'en_US',\
+siteName: 'The Daily Chronicle',\
+},\
+};
+
+**Configurator Page (`app/subscription/configure/page.tsx`):**
+Even though this is a Client Component, we define static metadata to ensure search engines understand the purchase intent of this page:
+export const metadata = {\
+title: 'Customize Your Subscription',\
+description: 'Choose between Daily, Weekend, or Digital-only access.',\
+robots: {\
+index: true,\
+follow: true, // We want Google to find the subscription options\
+},\
+};\
 
 ### File Tree
 
@@ -66,25 +94,46 @@ app/
 │ │ └── page.tsx # (Server) Summary & Submit\
 └── api/ # Next.js Route Handlers
 
-### Key Routing Decisions
-*   **Safe Navigation:** In the `ConfigurePage`, we utilize a `setTimeout` of 0ms before routing (`router.push`). This pushes navigation to the end of the event loop, ensuring React state and `sessionStorage` fully commit before the next page loads.
-*   **Route Guards:** The `CheckoutPage` implements a robust client-side guard. It checks for missing data (`currentUser` or `subscription`) and redirects to the start if necessary. This logic resides in a `useEffect` to avoid React "cannot update during render" errors.
-*   **Layout Grouping:** The `subscription` folder shares a layout. This lets us show the checkout steps (Progress Bar) on every page in that section without repeating code.
+### Static Files
+*   **`robots.txt`**: Explicitly allow `/subscription/configure` but disallow `/subscription/checkout` (to prevent indexing empty checkout states).
+*   **`sitemap.xml`**: Generated dynamically to include the Landing Page and the main Configurator route, helping crawlers find the purchase funnel immediately.
 
 ---
 
-## 4. SEO & Performance Plan
+## 4. Performance Considerations
 
-You need people to find the site and have a good experience when they do.
+### Route-Segment Code Splitting
+Next.js automatically splits code by route segments.
+*   **Impact:** When a user lands on the Homepage, they do not download the heavy validation logic needed for the `Register` or `Checkout` forms. This keeps the initial bundle size small (LCP optimization).
 
-### Search Engine Optimization (SEO)
-Even though the checkout flow is behind user interaction, search engines need to read your landing pages.
-*   **Metadata API:** We use Next.js's Metadata API to set dynamic titles and descriptions in `layout.tsx`.
-*   **Semantic HTML:** We use real tags like `<button>`, `<section>`, and `<h1>`. Search engines understand this structure better than a pile of `div`s.
-*   **Structured Data:** We will add Product schema (JSON-LD) to the homepage. This helps Google show your pricing directly in search results.
+### Core Web Vitals Optimizations
+1.  **LCP (Largest Contentful Paint):** We use the Next.js `<Image />` component with the `priority` prop on the homepage hero image to preload it immediately.
+2.  **CLS (Cumulative Layout Shift):** All images have reserved width/height dimensions. The "Progress Bar" in the subscription layout has a fixed height so the content doesn't jump when the bar loads.
+3.  **INP (Interaction to Next Paint):**
+    *   **The Navigation Fix:** Our custom `setTimeout(..., 0)` in `handleContinue` yields the main thread to the browser before navigating. This ensures the browser has a moment to paint the UI feedback (e.g., button click state) before the heavy work of routing begins, improving perceived responsiveness.
 
-### Performance Optimization
-*   **Code Splitting:** Next.js splits the code automatically. You do not download the checkout logic until you actually go to the checkout.
-*   **Image Optimization:** We use the `<Image />` component. It serves the right size image for your device (WebP format) and prevents the page from jumping around as it loads.
-*   **Memoization:** We wrap heavy calculations in `useMemo`. This stops the app from freezing on slower phones when you type or click.
-*   **Loading UI:** We show a loading skeleton while the app checks your address. You know something is happening, which reduces bounce rates.
+---
+
+## 5. Modern Next.js Features (Bonus)
+
+### Server Actions: Order Submission
+Instead of using a traditional API Route (`/api/submit-order`), we implement a **Server Action** for the final checkout step.
+
+*   **Location:** `app/actions/submitOrder.ts`
+*   **Benefit:** This allows the `CheckoutPage` to call a function directly like an RPC. It handles the database write securely on the server and can return validation errors directly to the form without managing `useEffect` fetch cycles.
+*   **Code Example:**
+    ```
+    // app/subscription/checkout/page.tsx
+    import { submitOrder } from '@/app/actions/submitOrder';
+
+    const handleSubmit = async () => {
+       const result = await submitOrder(currentSubscription);
+       if (result.success) router.push('/confirmation');
+    }
+    ```
+
+### Dynamic Social Preview (`ImageResponse`)
+We added an `opengraph-image.tsx` to the root `app/` folder. This uses the `ImageResponse` API (via Vercel OG) to generate a dynamic social card on the fly.
+
+*   **Logic:** It renders the newspaper logo alongside a real-time call to action (e.g., "Join 50,000 Readers").
+*   **Tech:** Converts HTML/CSS to an image at the Edge, ensuring that when users share the link on Twitter/LinkedIn, the preview is always crisp, branded, and performant.
