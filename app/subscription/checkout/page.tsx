@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 import { useAppContext } from '@/lib/context/AppContext';
 import { saveAboForCustomer } from '@/lib/Api';
@@ -20,9 +21,16 @@ export default function CheckoutPage() {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    // ✅ CORRECT - Move router.push into useEffect
+    const isMissingData = !currentUser || !currentSubscription || !deliveryPlz || !selectedVersion;
 
-    if (!currentUser || !currentSubscription || !deliveryPlz || !selectedVersion) {
-        router.push('/subscription/address');
+    useEffect(() => {
+        if (isMissingData) {
+            router.replace('/subscription/address');
+        }
+    }, [isMissingData, router]);
+
+    if (isMissingData) {
         return null;
     }
 

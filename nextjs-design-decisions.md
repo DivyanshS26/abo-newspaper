@@ -16,9 +16,12 @@ We use the `app/` directory structure. It gives you better layout nesting. This 
 We use **Tailwind CSS**. It speeds up development by letting you write styles directly in your markup. You can see this in our `ConfigurePage` where we use utility classes for grid layouts and colors. Tailwind also makes Dark Mode easy. You just add `dark:` modifiers. It builds a tiny CSS file that only includes the styles you actually use.
 
 ### State Management
-We use a hybrid approach.
-*   **Global State (Context API):** `useAppContext` saves your data (like delivery address and subscription type) as you move between steps. You do not want to lose your progress if you navigate back.
-*   **Local State:** We keep complex logic inside specific components. The `ConfigurePage` uses `useState` to toggle between "Daily" and "Weekend" options. This keeps the rest of the app fast because only that component re-renders.
+We use a hybrid approach combining Context API with persistent storage.
+*   **Global State (Context API):** `useAppContext` manages critical session data (`currentUser`, `currentSubscription`, `selectedVersion`) across the wizard steps.
+*   **Persistence Layer:** To prevent data loss on page refresh or navigation, we implemented a **synchronous storage pattern**:
+    *   **Wrappers:** Custom setters (e.g., `setCurrentUser`) update both React state and `sessionStorage` simultaneously.
+    *   **Lazy Initialization:** State initializes directly from `sessionStorage` on mount, ensuring data survives browser navigation.
+*   **Local State:** Complex UI logic, such as toggling between "Daily" and "Weekend" options in `ConfigurePage`, remains local to keep the app responsive.
 
 ### Business Logic Separation
 We separate business rules from UI code. You will find pricing and validation logic (like the "Berlin = Post Delivery" rule) in `lib/Api` and `Database.js`. This makes your React components cleaner. It also lets you test the rules without running the whole app.
@@ -45,6 +48,7 @@ We pre-build pages that do not change often, like the Privacy Policy and Landing
 We organized the routes to match the user journey.
 
 ### File Tree
+
 app/  
 ├── layout.tsx # Root layout (Fonts, SEO Metadata) \
 ├── page.tsx # Landing Page (Marketing) \
@@ -63,7 +67,8 @@ app/
 └── api/ # Next.js Route Handlers
 
 ### Key Routing Decisions
-*   **Separate Routes per Step:** We gave each step (Address, Configure, Register) its own URL. You can bookmark a page or use the browser back button without breaking the flow.
+*   **Safe Navigation:** In the `ConfigurePage`, we utilize a `setTimeout` of 0ms before routing (`router.push`). This pushes navigation to the end of the event loop, ensuring React state and `sessionStorage` fully commit before the next page loads.
+*   **Route Guards:** The `CheckoutPage` implements a robust client-side guard. It checks for missing data (`currentUser` or `subscription`) and redirects to the start if necessary. This logic resides in a `useEffect` to avoid React "cannot update during render" errors.
 *   **Layout Grouping:** The `subscription` folder shares a layout. This lets us show the checkout steps (Progress Bar) on every page in that section without repeating code.
 
 ---

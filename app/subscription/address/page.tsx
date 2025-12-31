@@ -139,7 +139,7 @@ export default function DeliveryAddressPage() {
                                         <input
                                             className="form-input w-full rounded-lg border border-[#e6e0db] dark:border-[#4a3e36] bg-white dark:bg-[#1e1610] h-14 px-4 text-lg text-[#181411] dark:text-white placeholder:text-[#897261] focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
                                             id="city"
-                                            placeholder="e.g. Stuttgart"
+                                            placeholder="e.g. Reutlingen"
                                             type="text"
                                             value={city}
                                             onChange={(e) => setCity(e.target.value)}
